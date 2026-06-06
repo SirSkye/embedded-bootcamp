@@ -88,6 +88,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
   /* USER CODE END 2 */
 
@@ -96,6 +97,18 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+	  uint8_t txData[3] = {0x01, 0x80, 0x00};
+	  uint8_t rxData[3] = {0, 0, 0};
+
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // CS Low
+	  HAL_SPI_TransmitReceive(&hspi1, txData, rxData, 3, HAL_MAX_DELAY);
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);   // CS High
+
+	  uint16_t result = ((rxData[1] & 0x03) << 8) | rxData[2];
+	  uint16_t pulse = 1000 + (result * 1000 / 1023);
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pulse);
+
+	  HAL_Delay(10);
 
     /* USER CODE BEGIN 3 */
   }
