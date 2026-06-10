@@ -36,6 +36,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PERIOD 64000
+#define MIN_PULSE (PERIOD / 20)
+#define MAX_PULSE (PERIOD / 10)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -112,7 +115,7 @@ int main(void)
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);   // CS High
 
 	  uint16_t result = ((rxData[1] & 0x03) << 8) | rxData[2];
-	  uint16_t pulse = 1000 + (result * 1000 / 1023);
+	  uint16_t pulse = MIN_PULSE + (result * (MAX_PULSE - MIN_PULSE) / 1023);
 	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pulse);
 
 	  HAL_Delay(10);
